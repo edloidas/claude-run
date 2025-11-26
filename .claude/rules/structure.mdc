@@ -1,0 +1,158 @@
+---
+description: Game architecture structure and conventions
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Structure Standards
+
+## Directory Layout
+
+```
+/src
+  /assets
+    /tilesets       # PNG tilesets (16x16 or 32x32)
+    /levels         # Tiled JSON exports
+    /sprites        # Player/enemy spritesheets
+    /audio          # Sound effects and music
+  /game
+    main.ts         # Phaser config and entry point
+    /scenes
+      BootScene.ts  # Asset loading scene
+      GameScene.ts  # Main gameplay scene
+      MenuScene.ts  # Title/menu screen
+    /entities
+      Player.ts     # Player entity and controller
+      Enemy.ts      # Base enemy class
+    /systems
+      CollisionSystem.ts  # Tile-based collision
+      InputSystem.ts      # Keyboard/gamepad input
+    /utils
+      collision.ts  # Collision helper functions
+      math.ts       # Vector/physics math helpers
+    /types
+      index.ts      # Shared type definitions
+```
+
+## File Naming Conventions
+
+| Category | Convention | Examples |
+|----------|------------|----------|
+| Scenes | PascalCase | `GameScene.ts`, `MenuScene.ts` |
+| Entities | PascalCase | `Player.ts`, `Enemy.ts`, `Collectible.ts` |
+| Systems | PascalCase | `CollisionSystem.ts`, `InputSystem.ts` |
+| Utils | camelCase | `collision.ts`, `math.ts`, `helpers.ts` |
+| Types | camelCase or index | `types/index.ts`, `types/entities.ts` |
+| Assets | kebab-case | `player-idle.png`, `level-01.json` |
+| Tests | source + `.test` | `collision.test.ts`, `math.test.ts` |
+
+## Module Organization
+
+### Scenes
+
+- One scene per file
+- Extend `Phaser.Scene`
+- Use `create()` for setup, `update()` for game loop
+
+```typescript
+export class GameScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameScene' });
+  }
+
+  create() {
+    // Initialize entities, load tilemap
+  }
+
+  update(time: number, delta: number) {
+    // Game loop logic
+  }
+}
+```
+
+### Entities
+
+- Entity classes extend Phaser game objects or use composition
+- Keep rendering separate from logic where possible
+- Store velocity and state as properties
+
+```typescript
+export class Player {
+  sprite: Phaser.GameObjects.Sprite;
+  velocity: { x: number; y: number };
+  grounded: boolean;
+
+  update(delta: number) {
+    // Movement and physics logic
+  }
+}
+```
+
+### Systems
+
+- Systems handle cross-cutting concerns (input, collision, audio)
+- Use static methods or singleton pattern for global systems
+- Keep systems stateless where possible
+
+```typescript
+export class InputSystem {
+  static isKeyDown(scene: Phaser.Scene, key: string): boolean {
+    return scene.input.keyboard?.addKey(key).isDown ?? false;
+  }
+}
+```
+
+### Utils
+
+- Pure functions only (easy to test)
+- No Phaser dependencies in utils (except types)
+- Group related functions in single files
+
+```typescript
+// collision.ts
+export function checkTileCollision(
+  layer: Phaser.Tilemaps.TilemapLayer,
+  x: number,
+  y: number
+): boolean {
+  const tile = layer.getTileAtWorldXY(x, y);
+  return tile !== null && tile.index !== -1;
+}
+```
+
+## Import Conventions
+
+```typescript
+// 1. External libraries
+import Phaser from 'phaser';
+
+// 2. Internal systems and entities
+import { Player } from '../entities/Player';
+import { CollisionSystem } from '../systems/CollisionSystem';
+
+// 3. Utils and helpers
+import { checkTileCollision } from '../utils/collision';
+
+// 4. Types (always last)
+import type { Entity, TileLayer } from '../types';
+```
+
+## Asset Organization
+
+### Tilesets
+
+- 16x16 or 32x32 pixel tiles (consistent per tileset)
+- PNG format with transparency
+- Name format: `tileset-name.png`
+
+### Levels
+
+- Tiled Map Editor JSON format
+- Separate layers: `ground`, `collision`, `objects`
+- Name format: `level-XX.json` (e.g., `level-01.json`)
+
+### Sprites
+
+- Spritesheet format preferred for animations
+- Include JSON atlas when using texture packer
+- Name format: `entity-action.png` (e.g., `player-idle.png`)

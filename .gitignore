@@ -1,0 +1,44 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# AI Assistant
+.claude/plans/
+.claude/settings.local.json
+.codex/
+.cursor/mcp.json
+.mcp.json
+
+# Build output
+dist/
+build/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Test coverage
+coverage/
+
+# Environment
+*.local
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Misc
+.cache/
+.temp/
+.tmp/

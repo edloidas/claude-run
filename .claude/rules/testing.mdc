@@ -1,0 +1,156 @@
+---
+description: Testing standards and best practices
+globs: *.test.ts,*.spec.ts
+alwaysApply: false
+---
+
+# Testing Standards
+
+## Test Structure
+
+```typescript
+// ✅ Arrange-Act-Assert pattern with vitest
+import { describe, it, expect, vi } from 'vitest';
+import { checkTileCollision, resolveCollision } from './collision';
+
+describe('collision utils', () => {
+  describe('checkTileCollision', () => {
+    it('should detect collision with solid tile', () => {
+      // Arrange
+      const mockLayer = createMockTileLayer({
+        solidTiles: [[0, 0], [1, 0]],
+        tileSize: 16,
+      });
+
+      // Act
+      const result = checkTileCollision(mockLayer, 8, 8);
+
+      // Assert
+      expect(result).toBe(true);
+    });
+
+    it('should return false for empty tile position', () => {
+      // Arrange
+      const mockLayer = createMockTileLayer({
+        solidTiles: [[0, 0]],
+        tileSize: 16,
+      });
+
+      // Act
+      const result = checkTileCollision(mockLayer, 32, 32);
+
+      // Assert
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('resolveCollision', () => {
+    it('should push entity out of solid tile', () => {
+      // Arrange
+      const entity = { x: 10, y: 10, width: 12, height: 14 };
+      const tile = { x: 0, y: 0, width: 16, height: 16 };
+
+      // Act
+      const resolved = resolveCollision(entity, tile);
+
+      // Assert
+      expect(resolved.x).toBe(16); // Pushed to right edge of tile
+    });
+  });
+});
+```
+
+## Mock Patterns
+
+```typescript
+import { vi } from 'vitest';
+
+// ✅ Mock modules
+vi.mock('../systems/InputSystem', () => ({
+  InputSystem: {
+    isKeyDown: vi.fn().mockReturnValue(false),
+    isKeyPressed: vi.fn().mockReturnValue(false),
+  },
+}));
+
+// ✅ Use factories for test data
+function createMockTileLayer(options: {
+  solidTiles?: [number, number][];
+  tileSize?: number;
+}): MockTileLayer {
+  const { solidTiles = [], tileSize = 16 } = options;
+
+  return {
+    tileSize,
+    getTileAtWorldXY: (x: number, y: number) => {
+      const tileX = Math.floor(x / tileSize);
+      const tileY = Math.floor(y / tileSize);
+      const isSolid = solidTiles.some(([tx, ty]) => tx === tileX && ty === tileY);
+      return isSolid ? { index: 1 } : null;
+    },
+  };
+}
+
+function createMockEntity(overrides?: Partial<Entity>): Entity {
+  return {
+    x: 0,
+    y: 0,
+    width: 12,
+    height: 14,
+    velocityX: 0,
+    velocityY: 0,
+    grounded: false,
+    ...overrides,
+  };
+}
+
+// ✅ Spy on methods
+it('should call onCollision callback', () => {
+  const onCollision = vi.fn();
+  const player = createMockEntity({ onCollision });
+
+  simulateCollision(player, mockTile);
+
+  expect(onCollision).toHaveBeenCalledWith(mockTile);
+});
+```
+
+## Math Utility Tests
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { clamp, lerp, normalizeVector } from './math';
+
+describe('math utils', () => {
+  describe('clamp', () => {
+    it('should clamp value within range', () => {
+      expect(clamp(5, 0, 10)).toBe(5);
+      expect(clamp(-5, 0, 10)).toBe(0);
+      expect(clamp(15, 0, 10)).toBe(10);
+    });
+  });
+
+  describe('lerp', () => {
+    it('should interpolate between values', () => {
+      expect(lerp(0, 100, 0.5)).toBe(50);
+      expect(lerp(0, 100, 0)).toBe(0);
+      expect(lerp(0, 100, 1)).toBe(100);
+    });
+  });
+
+  describe('normalizeVector', () => {
+    it('should normalize vector to unit length', () => {
+      const result = normalizeVector({ x: 3, y: 4 });
+      expect(result.x).toBeCloseTo(0.6);
+      expect(result.y).toBeCloseTo(0.8);
+    });
+  });
+});
+```
+
+## Test File Organization
+
+- Place test files next to source files: `collision.ts` → `collision.test.ts`
+- Focus on testing pure utility functions
+- Skip integration tests for Phaser game objects (use manual playtesting)
+- Use descriptive test names that explain expected behavior

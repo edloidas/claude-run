@@ -1,0 +1,54 @@
+{
+  "name": "claude-run",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A 2D platformer game built with Claude",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --fix .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
+    "test": "vitest",
+    "test:ci": "vitest run --coverage"
+  },
+  "keywords": [
+    "game",
+    "phaser",
+    "platformer",
+    "typescript"
+  ],
+  "author": {
+    "name": "Mikita Taukachou",
+    "url": "https://edloidas.io"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 24.0.0",
+    "pnpm": ">= 10.17.0"
+  },
+  "packageManager": "pnpm@10.17.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
+    "minimumReleaseAge": "7d"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.7",
+    "@types/node": "24.10.1",
+    "@vitest/coverage-v8": "4.0.14",
+    "typescript": "5.9.3",
+    "vite": "7.2.4",
+    "vitest": "4.0.14"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  }
+}

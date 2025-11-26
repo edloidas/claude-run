@@ -1,0 +1,88 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Using pnpm Scripts
+
+## Dependency Management
+
+- Always use `pnpm` instead of `npm` if possible:
+
+```bash
+# Manage dependencies
+pnpm install
+pnpm add <pkg>
+pnpm add -D <pkg>
+pnpm remove <pkg>
+
+# List packages with newer versions available
+pnpm update
+
+# List packages with newer versions available
+pnpm outdated
+
+# List packages with newer versions available
+pnpm dedupe
+
+# Prefer over `npx` to run one-off commands without installing globally
+pnpm dlx <cli>
+```
+
+- Pin critical dev tools (biome, vitest) to exact versions in `devDependencies` to avoid unexpected CI failures.
+
+## Project Scripts
+
+Use these commands to keep your code healthy, consistent, and secure:
+
+### Development
+
+- **`pnpm dev`**
+  Start the game development server.
+
+### Building
+
+- **`pnpm build`**
+  Build the game for production (cleans + compiles + bundles).
+
+- **`pnpm clean`**
+  Remove all build artifacts (dist, coverage, reports).
+
+### Code Quality
+
+- **`pnpm check`**
+  Run complete code quality check: typecheck + biome check.
+
+- **`pnpm typecheck`**
+  Validate TypeScript types without emitting files.
+
+- **`pnpm lint`**
+  Run Biome linter to catch code-style issues and potential bugs.
+
+- **`pnpm lint:fix`**
+  Auto-fix linting problems with Biome.
+
+- **`pnpm format`**
+  Run Biome formatter to normalize code style.
+
+- **`pnpm format:check`**
+  Check if files are properly formatted without making changes.
+
+### Testing
+
+- **`pnpm test`**
+  Run the test suite with vitest.
+
+- **`pnpm test:ci`**
+  Run tests in CI mode with coverage.
+
+### Preview
+
+- **`pnpm preview`**
+  Preview the production build locally.
+
+### Hooks
+
+- **`pnpm prepare`**
+  Set up Husky git hooks (runs automatically after install).
